@@ -1,5 +1,6 @@
 const express = require('express');
 const PORT = process.env.PORT || 3001;
+// I think this  bracket notation around animals kind of takes it out of being JSON
 const { animals } = require('./data/animals');
 
 const app = express();
@@ -26,7 +27,7 @@ function filterByQuery(query, animalsArray) {
       // array will then contain only the entries that contain the trait,
       // so at the end we'll have an array of animals that have every one 
       // of the traits when the .forEach() loop is finished.
-      /*
+      /* My Notes:
       * The filter method filters for stuff to add to the "new" filteredResults
       * array, this one is filtering for any of the animals in the array that
       * have the queried personality trait. It is checking if the trait is in
@@ -53,13 +54,31 @@ function filterByQuery(query, animalsArray) {
   return filteredResults;
 }
 
+function findById(id, animalsArray) {
+  const result = animalsArray.filter(animal => animal.id === id)[0];
+  // not sure why this wouldn't return an empty array
+  return result;
+}
+
 app.get('/api/animals', (req, res) => {
+  // We need this to be let, not const
   let results = animals;
   if (req.query) {
     results = filterByQuery(req.query, results);
   }
   res.json(results)
 });
+
+app.get('/api/animals/:id', (req, res) => {
+  const result = findById(req.params.id, animals);
+
+  if (result) {
+    res.json(result);
+  } else {
+    res.send(404);
+  }
+});
+
 
 
 app.listen(PORT, () => {
